@@ -16,10 +16,6 @@ source=('llvm/::svn+https://llvm.org/svn/llvm-project/llvm/tags/RELEASE_380/fina
 sha256sums=('SKIP' 'SKIP' 'SKIP')
 options=()
 
-pkgver() {
-  echo "3.8.0"
-}
-
 build() {
   mkdir -p libcxxabi_build
   cd       libcxxabi_build
