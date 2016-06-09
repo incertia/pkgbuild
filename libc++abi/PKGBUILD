@@ -1,6 +1,6 @@
 pkgname=libc++abi-svn
 pkgver=3.8.0
-pkgrel=2
+pkgrel=3
 pkgdesc="LLVM libc++abi"
 arch=('i686' 'x86_64')
 url="https://libcxxabi.llvm.org/"
@@ -23,7 +23,7 @@ pkgver() {
 build() {
   mkdir -p libcxxabi_build
   cd       libcxxabi_build
-  CC=clang CXX=clang++ cmake -G "Unix Makefiles" ../libcxx/ -DCMAKE_INSTALL_PREFIX=/usr/ -DLLVM_PATH=../llvm/ -DLIBCXXABI_LIBCXX_PATH=../libcxx/ ../libcxxabi/
+  CC=clang CXX=clang++ cmake -G "Unix Makefiles" ../libcxx/ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/ -DLLVM_PATH=../llvm/ -DLIBCXXABI_LIBCXX_PATH=../libcxx/ ../libcxxabi/
 
   make cxxabi
 }

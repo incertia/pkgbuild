@@ -1,6 +1,6 @@
 pkgname=libc++-svn
 pkgver=3.8.0
-pkgrel=2
+pkgrel=3
 pkgdesc="LLVM libc++"
 arch=('i686' 'x86_64')
 url="https://libcxx.llvm.org/"
@@ -23,7 +23,7 @@ pkgver() {
 build() {
   mkdir -p libcxx_build
   cd       libcxx_build
-  CC=clang CXX=clang++ cmake -G "Unix Makefiles" ../libcxx/ -DCMAKE_INSTALL_PREFIX=/usr/ -DLLVM_PATH=../llvm/ -DLIBCXX_CXX_ABI=libcxxabi -DLIBCXX_CXX_ABI_INCLUDE_PATHS=../libcxxabi/include/ ../libcxx/
+  CC=clang CXX=clang++ cmake -G "Unix Makefiles" ../libcxx/ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/ -DLLVM_PATH=../llvm/ -DLIBCXX_CXX_ABI=libcxxabi -DLIBCXX_CXX_ABI_INCLUDE_PATHS=../libcxxabi/include/ ../libcxx/
 
   make cxx
 }
