@@ -21,7 +21,7 @@ build() {
   cd       libcxx_build
   CC=clang CXX=clang++ cmake -G "Unix Makefiles" ../libcxx/ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/ -DLLVM_PATH=../llvm/ -DLIBCXX_CXX_ABI=libcxxabi -DLIBCXX_CXX_ABI_INCLUDE_PATHS=../libcxxabi/include/ ../libcxx/
 
-  make cxx
+  make -j8 cxx
 }
 
 check() {
