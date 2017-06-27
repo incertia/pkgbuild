@@ -1,0 +1,86 @@
+# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
+# Contributor: Chris Andrews <christophersimonandrews [at] gmail [dot] com>
+# Contributor: FadeMind <fademind@gmail.com>
+# Contributor: Serge Victor <arch@random.re>
+# Contributor: Krzysztof Wloch <wloszekk [at] gmail [dot] com>
+# Contributor: Luke McCarthy <luke@iogopro.co.uk>
+# Contributor: Will Song <incertia@incertia.net>
+
+pkgname=fasm
+pkgver=1.71.63
+pkgrel=1
+pkgdesc='Fast and efficient self-assembling x86 assembler for DOS, Windows and Linux operating systems'
+url='https://flatassembler.net/'
+arch=('i686' 'x86_64')
+license=('custom')
+depends_i686=('glibc')
+depends_x86_64=('lib32-glibc')
+makedepends_i686=('gcc')
+makedepends_x86_64=('gcc-multilib')
+provides=('fasm')
+conflicts=('fasm')
+source=(${pkgname}-${pkgver}.tgz::https://flatassembler.net/${pkgname}-${pkgver}.tgz)
+sha512sums=('a11be2d73bf3697d0e468377faa3401b8c6d2c61053e01ad7ed080f83812d09ddaca2563ff00711178c27025f33dbd43b587808d7b3e3974449e8bb721d61d67')
+
+build() {
+  cd ${pkgname}
+  CFLAGS+=" -m32 -pie"
+
+  if [[ "${CARCH}" == "x86_64" ]]; then
+    FASM=fasm.x64
+  else
+    FASM=fasm
+  fi
+
+  mkdir -p build
+
+  # compile fasm with itself
+  ./${FASM} ./source/Linux/${pkgname}.asm ./build/${pkgname}
+  chmod +x ./build/${pkgname}
+
+  if [[ "${CARCH}" == "x86_64" ]]; then
+    ./${FASM} ./source/Linux/x64/${pkgname}.asm ./build/${pkgname}.x64
+    chmod +x ./build/${pkgname}.x64
+  fi
+
+  # tools
+  local s
+  for s in listing prepsrc symbols; do
+    ./${FASM} tools/libc/${s}.asm ${s}.o
+    gcc ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} -o ${s} ${s}.o
+  done
+}
+
+package() {
+  cd ${pkgname}
+
+  CARCH="$(uname -m)"
+
+  install -Dm 755 ./build/${pkgname} -t "${pkgdir}/usr/bin"
+  ln -s "fasm" "${pkgdir}/usr/bin/fasm32"
+  chmod 755 "${pkgdir}/usr/bin/fasm32"
+
+  if [[ "${CARCH}" == "x86_64" ]]; then
+    install -Dm 755 ./build/${pkgname}.x64 -t "${pkgdir}/usr/bin"
+    ln -s "fasm.x64" "${pkgdir}/usr/bin/fasm64"
+    chmod 755 "${pkgdir}/usr/bin/fasm64"
+  fi
+
+  # tools
+  local s
+  for s in listing prepsrc symbols; do
+    install -Dm 755 ${s} "${pkgdir}/usr/bin/${pkgname}-${s}"
+  done
+
+  # docs
+  install -Dm 644 ${pkgname}.txt whatsnew.txt -t "${pkgdir}/usr/share/doc/${pkgname}"
+  install -Dm 644 examples/elfexe/*.asm -t "${pkgdir}/usr/share/doc/${pkgname}/examples/elfexe"
+  install -Dm 644 examples/elfexe/dynamic/*.asm -t "${pkgdir}/usr/share/doc/${pkgname}/examples/elfexe/dynamic"
+  install -Dm 644 examples/elfexe/dynamic/*.inc -t "${pkgdir}/usr/share/doc/${pkgname}/examples/elfexe/dynamic"
+  install -Dm 644 examples/elfobj/*.asm -t "${pkgdir}/usr/share/doc/${pkgname}/examples/elfobj"
+  install -Dm 644 examples/libcdemo/*.asm -t "${pkgdir}/usr/share/doc/${pkgname}/examples/libcdemo"
+  install -Dm 644 examples/libcdemo/*.inc -t "${pkgdir}/usr/share/doc/${pkgname}/examples/libcdemo"
+  install -Dm 644 license.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+
+# vim: ts=2 sw=2 et:
